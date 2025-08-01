@@ -1,4 +1,16 @@
-# Odoo
+# Pungkuran Odoo
+
+## About
+
+This Odoo fork is customized for Toko Plastik Pungkuran.
+
+The fork carries a lot of commit history (about 4-5 GB), so I recommend you to
+```
+git clone --depth=1 <this-repo-url>
+```
+
+## Odoo
+
 
 [![Build Status](https://runbot.odoo.com/runbot/badge/flat/1/master.svg)](https://runbot.odoo.com/runbot)
 [![Tech Doc](https://img.shields.io/badge/master-docs-875A7B.svg?style=flat&colorA=8F8F8F)](https://www.odoo.com/documentation/master)
