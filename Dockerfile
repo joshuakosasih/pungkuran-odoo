@@ -2,10 +2,8 @@ FROM python:3.11-slim
 # System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libpq-dev git wget xfonts-75dpi xfonts-base \
-    libldap2-dev libsasl2-dev gettext-base \
+    libldap2-dev libsasl2-dev gettext-base wkhtmltopdf \
   && rm -rf /var/lib/apt/lists/*
-# Note: wkhtmltopdf installation skipped due to compatibility issues with ARM64/Bookworm
-# PDF generation will use alternative methods or can be installed later if needed
 # App
 WORKDIR /opt/odoo
 COPY . .
