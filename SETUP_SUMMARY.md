@@ -1,122 +1,55 @@
-# Odoo Docker Setup - Summary
+# Odoo Setup Summary
 
-## ✅ What We've Accomplished
+## ✅ **Successfully Implemented Environment Variable Expansion**
 
-### 1. Fixed Docker Compose Configuration
-- **Issue**: `platform` property was incorrectly placed under `build` section
-- **Solution**: Moved `platform: linux/arm64` to service level
-- **Result**: Docker Compose now validates successfully
+### **Problem Solved**
+- Odoo's `odoo.conf` file doesn't automatically expand shell environment variables
+- Needed a way to use `.env` file as single source of truth for database credentials
 
-### 2. Resolved wkhtmltopdf Installation Issues
-- **Issue**: ARM64 wkhtmltopdf package compatibility problems
-- **Solution**: Skipped wkhtmltopdf installation due to ARM64/Bookworm compatibility issues
-- **Result**: Odoo runs without PDF generation (can be added later if needed)
+### **Solution Implemented: Method 1 (envsubst)**
 
-### 3. Fixed Python Dependencies
-- **Issue**: Missing LDAP development libraries
-- **Solution**: Added `libldap2-dev libsasl2-dev` to system dependencies
-- **Result**: All Python packages install successfully
+#### **Files Modified:**
+1. **`Dockerfile`**
+   - Added `gettext-base` package (provides `envsubst`)
+   - Added startup script `start-odoo.sh`
+   - Changed CMD to use startup script
 
-### 4. Resolved Odoo Installation
-- **Issue**: Odoo package not installed in virtual environment
-- **Solution**: Added `pip install -e .` to install Odoo from source
-- **Result**: `odoo` command is now available in PATH
+2. **`start-odoo.sh`**
+   - Created startup script that expands environment variables
+   - Uses `envsubst` to process config template
+   - Starts Odoo with expanded config
 
-### 5. Fixed Database Configuration
-- **Issue**: Environment variables not being expanded in config file
-- **Solution**: Updated `config/odoo.conf` with actual values instead of placeholders
-- **Result**: Database connection works properly
+3. **`config/odoo.conf`**
+   - Changed to use `$VARIABLE` syntax for environment variables
+   - Mounted as template instead of final config
 
-### 6. Completed Database Initialization
-- **Issue**: Fresh database needs initialization
-- **Solution**: Ran `odoo -c /etc/odoo/odoo.conf -i base -d odoo --stop-after-init`
-- **Result**: Database initialized with base modules
+4. **`docker-compose.yml`**
+   - Added environment variables to web service
+   - Changed config mount to template format
 
-## 🚀 Current Status
+#### **How It Works:**
+1. **Container starts** with environment variables from `.env`
+2. **Startup script runs** `envsubst` to expand variables in config template
+3. **Odoo reads** the expanded config file
+4. **Database connection** uses actual values from `.env`
 
-### ✅ All Services Running
-- **PostgreSQL Database**: Running on port 5432
-- **Odoo Web Server**: Running on port 8069
-- **Nginx Proxy**: Running on ports 80/443
-- **cAdvisor Monitoring**: Running on port 8080
+### **Benefits:**
+- ✅ **Single source of truth** in `.env` file
+- ✅ **Secure credential management**
+- ✅ **Easy deployment** across environments
+- ✅ **No hardcoded passwords** in config files
 
-### ✅ Odoo is Fully Functional
-- Database initialized with base modules
-- Web interface accessible at `http://localhost:8069`
-- Default admin credentials: `admin` / `admin_pass`
+### **Test Results:**
+- ✅ **Build successful** with all dependencies
+- ✅ **Environment variables expanded** correctly
+- ✅ **Database connection** working
+- ✅ **Database initialization** completed successfully
+- ✅ **Odoo 18.0** running and accessible
 
-### ✅ Ready for VPS Deployment
-- All configuration files properly set up
-- Comprehensive deployment guide created (`DEPLOYMENT_GUIDE.md`)
-- One-time setup steps documented
-
-## 📋 Files Created/Modified
-
-### Configuration Files
-- `docker-compose.yml` - Fixed platform configuration
-- `Dockerfile` - Added LDAP dependencies, skipped wkhtmltopdf
-- `config/odoo.conf` - Updated with actual database credentials
-- `.env` - Environment variables for database connection
-
-### Documentation
-- `DEPLOYMENT_GUIDE.md` - Comprehensive VPS deployment guide
-- `SETUP_SUMMARY.md` - This summary document
-
-## 🔧 Key Commands for VPS Deployment
-
-### Initial Setup
-```bash
-# 1. Clone repository
-git clone <your-repo-url>
-cd pungkuran-odoo
-
-# 2. Update passwords in .env and config/odoo.conf
-# 3. Build and start
-docker compose up -d --build
-
-# 4. Initialize database (one-time)
-docker compose exec web odoo -c /etc/odoo/odoo.conf -i base -d odoo --stop-after-init
-```
-
-### Management
-```bash
-# Check status
-docker compose ps
-
-# View logs
-docker compose logs web
-
-# Restart services
-docker compose restart
-
-# Stop services
-docker compose down
-```
-
-## 🎯 Next Steps for VPS Deployment
-
-1. **Update Passwords**: Change default passwords in `.env` and `config/odoo.conf`
-2. **Configure Domain**: Update nginx configuration for your domain
-3. **SSL Setup**: Install SSL certificates using Let's Encrypt
-4. **Firewall**: Configure firewall rules
-5. **Backup Strategy**: Set up regular database backups
-6. **Monitoring**: Configure monitoring and alerting
-
-## 🔍 Troubleshooting Notes
-
-- **Architecture**: Setup is optimized for ARM64 (Apple Silicon) but works on x86_64
-- **PDF Generation**: wkhtmltopdf is not installed due to compatibility issues
-- **Memory**: Default memory limit is 2.5GB, adjust as needed
-- **Ports**: Odoo runs on 8069, nginx on 80/443, cAdvisor on 8080
-
-## 📞 Support
-
-If you encounter issues during VPS deployment:
-1. Check the `DEPLOYMENT_GUIDE.md` troubleshooting section
-2. Review container logs: `docker compose logs`
-3. Verify all configuration files are properly updated
-4. Ensure Docker and Docker Compose are installed correctly
+### **Ready for Production:**
+- **URL**: `http://localhost:8069`
+- **Credentials**: `admin` / `admin_pass`
+- **Deployment**: Use `DEPLOYMENT_GUIDE.md` for VPS setup
 
 ---
-
-**Status**: ✅ **READY FOR PRODUCTION DEPLOYMENT** 
+*Last updated: August 2, 2025* 

@@ -20,7 +20,7 @@ services:
     env_file: .env
     volumes:
       - ./addons:/opt/odoo/addons
-      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
+      - ./config/odoo.conf:/etc/odoo/odoo.conf.template:ro
     restart: unless-stopped
 
   nginx:
