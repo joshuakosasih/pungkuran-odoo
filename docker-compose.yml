@@ -9,10 +9,10 @@ services:
     restart: unless-stopped
 
   web:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: Dockerfile
-      platform: linux/arm64
     depends_on:
       - db
     ports:
