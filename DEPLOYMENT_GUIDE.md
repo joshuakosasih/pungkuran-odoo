@@ -46,13 +46,18 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 # Verify installations
 docker --version && docker compose version && git --version
+
+# If docker can't detect docker-compose
+sudo mkdir -p /usr/lib/docker/cli-plugins
+sudo ln -s /usr/local/bin/docker-compose /usr/lib/docker/cli-plugins/docker-compose
+docker compose version
 ```
 
 ## 3. Quick Start
 
 ```bash
 # Clone repository
-git clone <your-repo-url>
+git clone --depth=1 https://github.com/joshuakosasih/pungkuran-odoo.git
 cd pungkuran-odoo
 
 # Configure environment (update passwords)

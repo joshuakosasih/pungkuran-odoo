@@ -2,8 +2,17 @@ FROM python:3.11-slim
 # System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libpq-dev git wget xfonts-75dpi xfonts-base \
-    libldap2-dev libsasl2-dev gettext-base wkhtmltopdf \
-  && rm -rf /var/lib/apt/lists/*
+    libldap2-dev libsasl2-dev gettext-base \
+  && ARCH=$(dpkg --print-architecture) \
+  && if [ "$ARCH" = "amd64" ]; then \
+       wget -O /tmp/wkhtmltox.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_amd64.deb; \
+     elif [ "$ARCH" = "arm64" ]; then \
+       wget -O /tmp/wkhtmltox.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_arm64.deb; \
+     else \
+       echo "Unsupported architecture: $ARCH" && exit 1; \
+     fi \
+  && dpkg -i /tmp/wkhtmltox.deb || apt-get install -f -y \
+  && rm -rf /var/lib/apt/lists/* /tmp/wkhtmltox.deb
 # App
 WORKDIR /opt/odoo
 COPY . .
